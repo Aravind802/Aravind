@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>EEG BCI Deep Learning</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body {
+font-family: Arial, Helvetica, sans-serif;
+background: #f4f6f9;
+margin: 0;
+padding: 0;
+}
+.container {
+max-width: 900px;
+margin: 40px auto;
+background: #ffffff;
+padding: 30px;
+border-radius: 10px;
+box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+h1 {
+text-align: center;
+color: #2c3e50;
+}
+p {
+color: #555;
+}
+textarea {
+width: 100%;
+height: 200px;
+margin-top: 10px;
+padding: 10px;
+font-family: monospace;
+font-size: 14px;
+}
+button {
+margin-top: 20px;
+padding: 12px 20px;
+background: #3498db;
+border: none;
+color: #fff;
+font-size: 16px;
+cursor: pointer;
+border-radius: 5px;
+}
+button:hover {
+background: #2980b9;
+}
+.result {
+margin-top: 20px;
+padding: 15px;
+background: #ecf0f1;
+border-radius: 5px;
+}
+.footer {
+text-align: center;
+margin-top: 30px;
+color: #777;
+font-size: 14px;
+}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>EEG BCI Deep Learning Interface</h1>
+<p>
+Paste EEG data in JSON format below.<br>
+Expected shape: <b>(channels × samples)</b><br>
+Example: <code>[[0.1, 0.2, ...], [...]]</code>
+</p>
+<textarea id="eegInput" placeholder='[[0.0, 0.1, ...], [...]]'></textarea>
+<button onclick="sendPrediction()">Predict Class</button>
+<div class="result" id="result">
+Prediction result will appear here.
+</div>
+</div>
+<div class="footer">
+EEG-based Brain–Computer Interface | Flask + PyTorch
+</div>
+<script>
+async function sendPrediction() {
+const eegText = document.getElementById("eegInput").value;
+let eegData;
+try {
+eegData = JSON.parse(eegText);
+} catch (e) {
+document.getElementById("result").innerText = "Invalid JSON format";
+return;
+}
+const response = await fetch("/predict", {
+method: "POST",
+headers: {
+"Content-Type": "application/json"
+},
+body: JSON.stringify({ eeg: eegData })
+});
+const result = await response.json();
+if (result.error) {
+document.getElementById("result").innerText = "Error: " + result.error;
+} else {
+document.getElementById("result").innerText = "Predicted Class: " + result.prediction;
+}
+}
+</script>
+</body>
+</html>
