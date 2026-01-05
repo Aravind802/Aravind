@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LLM Comparison</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        textarea {
+            width: 100%;
+            height: 120px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .card {
+            background: #fff;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        pre {
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+
+<h1>LLM Comparison</h1>
+
+<textarea id="prompt" placeholder="Enter your prompt..."></textarea>
+<br>
+<button onclick="compare()">Compare</button>
+
+<div id="results"></div>
+
+<script>
+async function compare() {
+    const prompt = document.getElementById("prompt").value;
+    const results = document.getElementById("results");
+
+    results.innerHTML = "Loading...";
+
+    try {
+        const response = await fetch("/compare", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ prompt })
+        });
+
+        const data = await response.json();
+
+        results.innerHTML = `
+            <div class="card"><h3>OpenAI</h3><pre>${data.openai}</pre></div>
+            <div class="card"><h3>Claude</h3><pre>${data.claude}</pre></div>
+            <div class="card"><h3>Gemini</h3><pre>${data.gemini}</pre></div>
+        `;
+    } catch (err) {
+        results.innerHTML = "Error connecting to backend";
+    }
+}
+</script>
+
+</body>
+</html>
